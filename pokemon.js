@@ -1,148 +1,224 @@
-// Pokemon database - (we can expand this)
-const pokemonDatabase = [
-    { name: "Pikachu", emoji: "⚡", type: "Electric" },
-    { name: "Charizard", emoji: "🔥", type: "Fire/Flying" },
-    { name: "Bulbasaur", emoji: "🌱", type: "Grass/Poison" },
-    { name: "Squirtle", emoji: "💧", type: "Water" },
-    { name: "Jigglypuff", emoji: "🎵", type: "Normal/Fairy" },
-    { name: "Meowth", emoji: "😺", type: "Normal" },
-    { name: "Psyduck", emoji: "🦆", type: "Water" },
-    { name: "Gengar", emoji: "👻", type: "Ghost/Poison" },
-    { name: "Snorlax", emoji: "😴", type: "Normal" },
-    { name: "Mewtwo", emoji: "🧬", type: "Psychic" },
-    { name: "Eevee", emoji: "🦊", type: "Normal" },
-    { name: "Dragonite", emoji: "🐉", type: "Dragon/Flying" }
-];
+// ===============================
+//     WHO'S THAT POKÉMON
+//     — CONTINUOUS + TIMER + SOUND —
+// ===============================
 
 let currentPokemon = null;
+let correctAnswer = "";
 let score = 0;
-let guessedPokemon = [];
+let attempt = 0;
 
-function initGame() {
+let timerInterval = null;
+let timeLeft = 12;
+
+const pokemonImage = document.getElementById("pokemonImage");
+const choicesArea = document.getElementById("choicesArea");
+
+// ---------------------------------------------
+// PRELOAD ALL POKÉMON NAMES (FAST + RELIABLE)
+// ---------------------------------------------
+let allPokemonNames = [];
+
+async function preloadPokemonNames() {
+    const res = await fetch("https://pokeapi.co/api/v2/pokemon?limit=898");
+    const data = await res.json();
+    allPokemonNames = data.results.map(p => capitalize(p.name));
+}
+
+// ---------------------------------------------
+// GET RANDOM POKÉMON
+// ---------------------------------------------
+async function getRandomPokemon() {
+    while (true) {
+        const id = Math.floor(Math.random() * 898) + 1;
+        const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+        const data = await res.json();
+
+        const sprite = data.sprites.other["official-artwork"].front_default;
+
+        // Skip Pokémon with no artwork → avoids freezing
+        if (sprite) {
+            return {
+                name: capitalize(data.name),
+                sprite: sprite
+            };
+        }
+    }
+}
+
+// ---------------------------------------------
+// START GAME
+// ---------------------------------------------
+async function initGame() {
     score = 0;
-    guessedPokemon = [];
     updateScore();
-    renderPokemonList();
+    await preloadPokemonNames();
     loadNewPokemon();
 }
 
-function loadNewPokemon() {
-    const availablePokemon = pokemonDatabase.filter(p => !guessedPokemon.includes(p.name));
-    
-    if (availablePokemon.length === 0) {
-        showModal(true, "You caught them all!", "Congratulations! You've guessed all Pokemon!");
-        return;
+// ---------------------------------------------
+// LOAD NEW ROUND
+// ---------------------------------------------
+async function loadNewPokemon() {
+    clearInterval(timerInterval);
+
+    attempt = 0;
+    timeLeft = 12;
+
+    choicesArea.innerHTML = "";
+    pokemonImage.innerHTML = "Loading...";
+    document.getElementById("timer").textContent = timeLeft;
+
+    currentPokemon = await getRandomPokemon();
+    correctAnswer = currentPokemon.name;
+
+    pokemonImage.classList.add("silhouette");
+    pokemonImage.innerHTML = `<img src="${currentPokemon.sprite}" height="250">`;
+
+    generateChoices();
+    startTimer();
+}
+
+// ---------------------------------------------
+// GENERATE CHOICES
+// ---------------------------------------------
+function generateChoices() {
+    const choices = new Set();
+    choices.add(correctAnswer);
+
+    while (choices.size < 4) {
+        const randomName = allPokemonNames[Math.floor(Math.random() * allPokemonNames.length)];
+        if (randomName !== correctAnswer) choices.add(randomName);
     }
 
-    const randomIndex = Math.floor(Math.random() * availablePokemon.length);
-    currentPokemon = availablePokemon[randomIndex];
-    
-    document.getElementById('pokemonImage').textContent = currentPokemon.emoji;
-    document.getElementById('pokemonImage').classList.add('silhouette');
-    document.getElementById('pokemonHint').textContent = `Type: ${currentPokemon.type}`;
-    
-    generateChoices();
-}
+    const finalChoices = [...choices].sort(() => Math.random() - 0.5);
 
-function generateChoices() {
-    const choicesArea = document.getElementById('choicesArea');
-    choicesArea.innerHTML = '';
-    
-    // Get 3 wrong answers
-    const wrongChoices = pokemonDatabase
-        .filter(p => p.name !== currentPokemon.name)
-        .sort(() => Math.random() - 0.5)
-        .slice(0, 3);
-    
-    // Combine with correct answer and shuffle
-    const allChoices = [...wrongChoices, currentPokemon].sort(() => Math.random() - 0.5);
-    
-    // Create buttons
-    allChoices.forEach(pokemon => {
-        const button = document.createElement('button');
-        button.className = 'choice-button';
-        button.textContent = pokemon.name;
-        button.onclick = () => checkGuess(pokemon.name);
-        choicesArea.appendChild(button);
+    choicesArea.innerHTML = "";
+
+    finalChoices.forEach(choice => {
+        const btn = document.createElement("button");
+        btn.className = "choice-button";
+        btn.textContent = choice;
+        btn.onclick = () => handleGuess(choice);
+        choicesArea.appendChild(btn);
     });
 }
 
-function checkGuess(guessedName) {
-    const buttons = document.querySelectorAll('.choice-button');
-    
-    // Disable all buttons
-    buttons.forEach(btn => {
-        btn.style.pointerEvents = 'none';
-        if (btn.textContent === currentPokemon.name) {
-            btn.classList.add('correct');
-        } else if (btn.textContent === guessedName) {
-            btn.classList.add('incorrect');
+// ---------------------------------------------
+// COUNTDOWN TIMER
+// ---------------------------------------------
+function startTimer() {
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById("timer").textContent = timeLeft;
+
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            handleGuess("TIMEOUT");
         }
-    });
+    }, 1000);
+}
 
-    if (guessedName === currentPokemon.name) {
-        // Correct guess
-        document.getElementById('pokemonImage').classList.remove('silhouette');
+// ---------------------------------------------
+// GUESS LOGIC
+// ---------------------------------------------
+function handleGuess(selected) {
+    clearInterval(timerInterval);
+
+    const correctSound = document.getElementById("correctSound");
+    const lowhpSound = document.getElementById("lowhpSound");
+
+    disableAllButtons();
+
+    // CORRECT
+    if (selected === correctAnswer) {
+        pokemonImage.classList.remove("silhouette");
+        highlightButton(selected, "correct");
+        correctSound.play();
         score++;
         updateScore();
-        guessedPokemon.push(currentPokemon.name);
-        renderPokemonList();
+
         setTimeout(() => {
-            showModal(true, "Correct!", `It's ${currentPokemon.name}!`);
-        }, 800);
-    } else {
-        // Wrong guess
-        document.getElementById('pokemonImage').classList.remove('silhouette');
-        setTimeout(() => {
-            showModal(false, "Incorrect!", `Wrong answer! The correct answer was ${currentPokemon.name}. Starting over...`);
-        }, 800);
+            clearHighlights();
+            loadNewPokemon();
+        }, 1200);
+    }
+
+    // WRONG
+    else {
+        attempt++;
+        highlightButton(selected, "incorrect");
+        lowhpSound.play();  // GEN 5 LOW HP MUSIC
+
+        // 2 wrong attempts → reset streak
+        if (attempt >= 2) {
+            score = 0;
+            updateScore();
+            pokemonImage.classList.remove("silhouette");
+
+            setTimeout(() => {
+                clearHighlights();
+                loadNewPokemon();
+            }, 1500);
+        }
+
+        // First wrong attempt → allow second chance
+        else {
+            setTimeout(enableAllButtons, 900);
+        }
     }
 }
 
-function showModal(isCorrect, title, text) {
-    const modal = document.getElementById('modal');
-    const modalContent = document.getElementById('modalContent');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalText = document.getElementById('modalText');
-
-    modalTitle.textContent = title;
-    modalText.textContent = text;
-    
-    modalContent.className = 'modal-content ' + (isCorrect ? 'correct' : 'incorrect');
-    modal.classList.add('show');
+// ---------------------------------------------
+// HELPERS
+// ---------------------------------------------
+function disableAllButtons() {
+    document.querySelectorAll(".choice-button").forEach(b => b.disabled = true);
 }
 
-function handleModalClose() {
-    const modal = document.getElementById('modal');
-    modal.classList.remove('show');
-    
-    const modalContent = document.getElementById('modalContent');
-    if (modalContent.classList.contains('incorrect')) {
-        // Wrong answer - restart game
-        initGame();
-    } else {
-        // Correct answer - load next pokemon
-        loadNewPokemon();
-    }
+function enableAllButtons() {
+    document.querySelectorAll(".choice-button").forEach(b => b.disabled = false);
+}
+
+function highlightButton(name, state) {
+    document.querySelectorAll(".choice-button").forEach(btn => {
+        if (btn.textContent === name) btn.classList.add(state);
+    });
+}
+
+function clearHighlights() {
+    document.querySelectorAll(".choice-button").forEach(btn => {
+        btn.classList.remove("correct", "incorrect");
+    });
 }
 
 function updateScore() {
-    document.getElementById('score').textContent = score;
+    document.getElementById("score").textContent = score;
 }
 
-function renderPokemonList() {
-    const list = document.getElementById('pokemonList');
-    list.innerHTML = '';
-    
-    pokemonDatabase.forEach(pokemon => {
-        const item = document.createElement('div');
-        item.className = 'pokemon-item' + (guessedPokemon.includes(pokemon.name) ? ' guessed' : '');
-        item.textContent = `${pokemon.emoji} ${pokemon.name}`;
-        list.appendChild(item);
-    });
+function capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-// Initialize game on load
-window.addEventListener('DOMContentLoaded', function() {
-    initGame();
-});
+// ---------------------------------------------
+// START GAME
+// ---------------------------------------------
+window.addEventListener("DOMContentLoaded", initGame);
+
+const correctSound = document.getElementById("correctSound");
+
+if (selected === correctAnswer) {
+    pokemonImage.classList.remove("silhouette");
+    highlightButton(selected, "correct");
+
+    stopAllSounds();   // <-- ADD THIS
+    correctSound.play();
+
+    score++;
+    updateScore();
+
+    setTimeout(() => {
+        clearHighlights();
+        loadNewPokemon();
+    }, 1200);
+}
