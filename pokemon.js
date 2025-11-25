@@ -1,6 +1,6 @@
 // ===============================
-//     WHO'S THAT POKÉMON
-//     — CONTINUOUS + TIMER + SOUND —
+//     WHO'S THAT POKÉMON?
+//     Continuous · Timer · Sound
 // ===============================
 
 let currentPokemon = null;
@@ -13,16 +13,41 @@ let timeLeft = 12;
 
 const pokemonImage = document.getElementById("pokemonImage");
 const choicesArea = document.getElementById("choicesArea");
+const pokemonList = document.getElementById("pokemonList");
+
+// Preloaded list of Pokémon names
+let allPokemonNames = [];
 
 // ---------------------------------------------
 // PRELOAD ALL POKÉMON NAMES (FAST + RELIABLE)
 // ---------------------------------------------
-let allPokemonNames = [];
-
 async function preloadPokemonNames() {
     const res = await fetch("https://pokeapi.co/api/v2/pokemon?limit=898");
     const data = await res.json();
     allPokemonNames = data.results.map(p => capitalize(p.name));
+}
+
+// ---------------------------------------------
+// REFERENCE BANK — CLEAR + ADD NEW ENTRY
+// ---------------------------------------------
+function addReferenceEntry(pokemon) {
+    pokemonList.innerHTML = ""; // Clear old info
+
+    const entry = document.createElement("div");
+
+    const heightMeters = (pokemon.height / 10).toFixed(1);
+    const weightKg = pokemon.weight / 10;
+    const weightLbs = (weightKg * 2.20462).toFixed(1);
+
+    const typesText = pokemon.types.join(" / ");
+
+    entry.innerHTML = `
+        <small>
+            ${typesText}-type · ${heightMeters} m · ${weightLbs} lbs
+        </small>
+    `;
+
+    pokemonList.appendChild(entry);
 }
 
 // ---------------------------------------------
@@ -36,31 +61,16 @@ async function getRandomPokemon() {
 
         const sprite = data.sprites.other["official-artwork"].front_default;
 
-        // Skip Pokémon with no artwork → avoids freezing
         if (sprite) {
             return {
                 name: capitalize(data.name),
-                sprite: sprite
+                sprite: sprite,
+                types: data.types.map(t => capitalize(t.type.name)),
+                height: data.height,
+                weight: data.weight
             };
         }
     }
-}
-
-function addReferenceEntry(pokemon) {
-    const entry = document.createElement("div");
-
-    // Convert PokeAPI units:
-    // height: decimeters -> meters, weight: hectograms -> kg -> lbs
-    const heightMeters = (pokemon.height / 10).toFixed(1); // e.g. 17 -> 1.7 m
-    const weightKg = pokemon.weight / 10;                  // e.g. 905 -> 90.5 kg
-    const weightLbs = (weightKg * 2.20462).toFixed(1);     // kg -> lbs
-
-    const typesText = pokemon.types.join(" / ");
-
-    entry.innerHTML =
-        "<small>" + typesText + "-type · " + heightMeters + " m · " + weightLbs + " lbs</small>";
-
-    pokemonList.appendChild(entry);
 }
 
 // ---------------------------------------------
@@ -89,6 +99,8 @@ async function loadNewPokemon() {
     currentPokemon = await getRandomPokemon();
     correctAnswer = currentPokemon.name;
 
+    addReferenceEntry(currentPokemon);
+
     pokemonImage.classList.add("silhouette");
     pokemonImage.innerHTML = `<img src="${currentPokemon.sprite}" height="250">`;
 
@@ -97,7 +109,7 @@ async function loadNewPokemon() {
 }
 
 // ---------------------------------------------
-// GENERATE CHOICES
+// GENERATE CHOICE BUTTONS
 // ---------------------------------------------
 function generateChoices() {
     const choices = new Set();
@@ -147,11 +159,14 @@ function handleGuess(selected) {
 
     disableAllButtons();
 
-    // CORRECT
+    // CORRECT GUESS
     if (selected === correctAnswer) {
         pokemonImage.classList.remove("silhouette");
         highlightButton(selected, "correct");
+
+        stopAllSounds();
         correctSound.play();
+
         score++;
         updateScore();
 
@@ -161,13 +176,14 @@ function handleGuess(selected) {
         }, 1200);
     }
 
-    // WRONG
+    // WRONG GUESS
     else {
         attempt++;
         highlightButton(selected, "incorrect");
-        lowhpSound.play();  // GEN 5 LOW HP MUSIC
 
-        // 2 wrong attempts → reset streak
+        stopAllSounds();
+        lowhpSound.play();
+
         if (attempt >= 2) {
             score = 0;
             updateScore();
@@ -177,13 +193,21 @@ function handleGuess(selected) {
                 clearHighlights();
                 loadNewPokemon();
             }, 1500);
-        }
-
-        // First wrong attempt → allow second chance
-        else {
+        } else {
             setTimeout(enableAllButtons, 900);
         }
     }
+}
+
+// ---------------------------------------------
+// SOUND RESETTER
+// ---------------------------------------------
+function stopAllSounds() {
+    const sounds = document.querySelectorAll("audio");
+    sounds.forEach(s => {
+        s.pause();
+        s.currentTime = 0;
+    });
 }
 
 // ---------------------------------------------
@@ -218,24 +242,6 @@ function capitalize(str) {
 }
 
 // ---------------------------------------------
-// START GAME
+// START GAME WHEN PAGE LOADS
 // ---------------------------------------------
 window.addEventListener("DOMContentLoaded", initGame);
-
-const correctSound = document.getElementById("correctSound");
-
-if (selected === correctAnswer) {
-    pokemonImage.classList.remove("silhouette");
-    highlightButton(selected, "correct");
-
-    stopAllSounds();   // <-- ADD THIS
-    correctSound.play();
-
-    score++;
-    updateScore();
-
-    setTimeout(() => {
-        clearHighlights();
-        loadNewPokemon();
-    }, 1200);
-}
