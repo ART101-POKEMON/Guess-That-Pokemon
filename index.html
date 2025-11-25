@@ -15,6 +15,7 @@
 
             <div class="pokemon-display">
                 <div class="pokemon-image silhouette" id="pokemonImage">❓
+
 </div>
                 <p id="pokemonHint"></p>
             </div>
@@ -28,13 +29,23 @@
         </div>
     </div>
 
-    <div class="model" id="model">
-        <div class="model-content" id="modelContent">
-            <h2 id="modelTitle"></h2>
-            <p id="modelText"></p>
+    <div class="modal" id="modal">
+        <div class="modal-content" id="modalContent">
+            <h2 id="modalTitle"></h2>
+            <p id="modalText"></p>
             <button onclick="handleModalClose()">Continue</button>
         </div>
     </div>
+<audio id="lowhpSound" src="sounds/lowhp.mp3"></audio>
+
+<div class="score">
+    Score: <span id="score">0</span>
+</div>
+
+<div class="timer">
+    Time Left: <span id="timer">12</span>s
+</div>
+<audio id="correctSound" src="sounds/correct.mp3"></audio>
 
     <script src="script.js"></script>
 </body>
