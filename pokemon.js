@@ -46,6 +46,23 @@ async function getRandomPokemon() {
     }
 }
 
+function addReferenceEntry(pokemon) {
+    const entry = document.createElement("div");
+
+    // Convert PokeAPI units:
+    // height: decimeters -> meters, weight: hectograms -> kg -> lbs
+    const heightMeters = (pokemon.height / 10).toFixed(1); // e.g. 17 -> 1.7 m
+    const weightKg = pokemon.weight / 10;                  // e.g. 905 -> 90.5 kg
+    const weightLbs = (weightKg * 2.20462).toFixed(1);     // kg -> lbs
+
+    const typesText = pokemon.types.join(" / ");
+
+    entry.innerHTML =
+        "<small>" + typesText + "-type · " + heightMeters + " m · " + weightLbs + " lbs</small>";
+
+    pokemonList.appendChild(entry);
+}
+
 // ---------------------------------------------
 // START GAME
 // ---------------------------------------------
