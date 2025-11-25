@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Who's That Pokemon?</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="game-area">
+            <h1>Who's That Pokemon?</h1>
+            <div class="score">Score: <span id="score">0</span></div>
+
+            <div class="pokemon-display">
+                <div class="pokemon-image silhouette" id="pokemonImage">❓
+</div>
+                <p id="pokemonHint"></p>
+            </div>
+
+            <div class="choices-area" id="choicesArea"></div>
+        </div>
+
+        <div class="reference-bank">
+            <h2>Pokemon Reference</h2>
+            <div class="pokemon-list" id="pokemonList"></div>
+        </div>
+    </div>
+
+    <div class="model" id="model">
+        <div class="model-content" id="modelContent">
+            <h2 id="modelTitle"></h2>
+            <p id="modelText"></p>
+            <button onclick="handleModalClose()">Continue</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
