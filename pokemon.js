@@ -256,13 +256,13 @@ function resetGame() {
     timeLeft = 12;
     document.getElementById("timer").textContent = timeLeft;
 
-    generatePokemon();   // your function that picks a new Pokémon
+    getRandomPokemon();   // your function that picks a new Pokémon
 
     startTimer();        // restart countdown
 }
 
 window.onload = () => {
-    generatePokemon();
+    getRandomPokemon();
     startTimer();
 };
 
