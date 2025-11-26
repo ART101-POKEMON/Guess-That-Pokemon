@@ -137,13 +137,16 @@ function generateChoices() {
 // COUNTDOWN TIMER
 // ---------------------------------------------
 function startTimer() {
+    clearInterval(timerInterval); // stop any previous timer
+
     timerInterval = setInterval(() => {
         timeLeft--;
         document.getElementById("timer").textContent = timeLeft;
 
+        // When timer reaches zero → RESET GAME
         if (timeLeft <= 0) {
             clearInterval(timerInterval);
-            handleGuess("TIMEOUT");
+            resetGame();
         }
     }, 1000);
 }
@@ -245,3 +248,21 @@ function capitalize(str) {
 // START GAME WHEN PAGE LOADS
 // ---------------------------------------------
 window.addEventListener("DOMContentLoaded", initGame);
+
+function resetGame() {
+    score = 0;
+    document.getElementById("score").textContent = score;
+
+    timeLeft = 12;
+    document.getElementById("timer").textContent = timeLeft;
+
+    generatePokemon();   // your function that picks a new Pokémon
+
+    startTimer();        // restart countdown
+}
+
+window.onload = () => {
+    generatePokemon();
+    startTimer();
+};
+
