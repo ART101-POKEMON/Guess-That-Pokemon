@@ -5,20 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Who's That Pokemon?</title>
     <link rel="stylesheet" href="pokemon.css">
-    <script src="pokemon.js" DEFER></script>
+    <script src="pokemon.js" defer></script>
 </head> 
 
 <body> 
     
     <div class="container">
         <div class="game-area">
+
             <h1>Who's That <img id="pokemonlogo" src="pokemonlogo.png"></img>?</h1>
+
+            <!-- SCORE DISPLAY -->
             <div class="score">Score: <span id="score">0</span></div>
 
-            <div class="pokemon-display">
-                <div class="pokemon-image silhouette" id="pokemonImage">❓
+            <!-- ⭐ NEW: DIFFICULTY MODES -->
+            <div class="difficulty-select">
+                <button class="difficulty-btn" data-mode="easy">Easy</button>
+                <button class="difficulty-btn" data-mode="normal">Normal</button>
+                <button class="difficulty-btn" data-mode="hard">Hard</button>
+            </div>
 
-</div>
+            <div class="pokemon-display">
+                <div class="pokemon-image silhouette" id="pokemonImage">❓</div>
                 <p id="pokemonHint"></p>
             </div>
 
@@ -29,21 +37,30 @@
             <h2>Pokemon Reference</h2>
             <div class="pokemon-list" id="pokemonList"></div>  
             <img class="pokedex" src="pokedex.png"></img>
+
+            <!-- ⭐ NEW: POKEDEX GUESS HISTORY -->
+            <h3>Guess History</h3>
+            <div class="guess-history" id="guessHistory"></div>
         </div>
     </div>
 
+    <!-- EXISTING MODAL -->
     <div class="modal" id="modal">
         <div class="modal-content" id="modalContent">
             <h2 id="modalTitle"></h2>
             <p id="modalText"></p>
             <button onclick="handleModalClose()">Continue</button>
         </div>
-    </div>
-<audio id="lowhpSound" src="sounds/lowhp.mp3"></audio>
+    </div>  
 
-<div class="timer">
-    Time Left: <span id="timer">12</span>s
-</div>
+    <!-- AUDIO -->
+    <audio id="lowhpSound" src="sounds/lowhp.mp3"></audio>
     <audio id="correctSound" src="sounds/correct.mp3"></audio>
+
+    <!-- TIMER -->
+    <div class="timer">
+        Time Left: <span id="timer">12</span>s
+    </div>
+
 </body>
 </html>
