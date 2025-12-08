@@ -30,6 +30,9 @@ h1, h2 {
     font-weight: 900; 
     color:rgb(192, 12, 48); 
     text-shadow: 0 2px#0f671c; 
+} 
+h1{ 
+    font-size: 50px;
 }
 
 /* ================================
@@ -240,4 +243,23 @@ h1, h2 {
     border-radius: 14px;                      /* keep rounded corners */
     border: 1px solid rgba(255, 255, 255, 0.35); /* definition edge */
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+} 
+
+/* ================================
+IMAGES
+================================ */ 
+#pokemonlogo{ 
+    max-height: 150px; 
+    max-width: 150px; 
+    text-shadow:0 5px #093a10; 
+}  
+.pokedex{ 
+    flex: auto; 
+    align-items: center; 
+    width: 260px;
+    height: 260px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center; 
+    margin-top: 50px;
 }
