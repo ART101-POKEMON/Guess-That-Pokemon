@@ -23,9 +23,9 @@ let guessHistory = []; // stores last N guesses
 // Difficulty setup
 let currentDifficulty = "normal"; // default
 const difficultySettings = {
-    easy: { choices: 2, time: 15 },
-    normal: { choices: 4, time: 12 },
-    hard: { choices: 6, time: 10 }
+    easy: { choices: 2, time: 15, maxAttempts: 1 },
+    normal: { choices: 4, time: 12, maxAttempts: 2 },
+    hard: { choices: 6, time: 10, maxAttempts: 2 }
 };
 
 const pokemonImage = document.getElementById("pokemonImage");
@@ -240,7 +240,7 @@ function handleGuess(selected) {
         attempt++;
         highlightButton(selected, "incorrect");
         lowhpSound.play();
-        if (attempt >= 2) {
+        if (attempt >= difficultySettings[currentDifficulty].maxAttempts) {
             score = 0;
             updateScore();
             updateRoundTracker(false);
