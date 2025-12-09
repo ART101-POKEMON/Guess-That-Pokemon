@@ -287,24 +287,27 @@ h3{
     text-align:center; 
 }
 
+/* ================================
+   ROUND TRACKER / CIRCLES
+================================ */
 .round-tracker {
     display: flex;
     justify-content: center;
     gap: 15px;
-    margin: 20px auto;
+    margin: 20px auto 30px auto; /* top/bottom margin for spacing */
     padding: 15px;
-    background: rgba(170, 220, 143, 0.118);
+    max-width: 400px;
+    background: rgba(170, 220, 143, 0.15);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(10px);
     border-radius: 14px;
     border: 1px solid rgba(255, 255, 255, 0.35);
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
-    max-width: 350px;
 }
 
 .circle {
-    width: 35px;
-    height: 35px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     border: 3px solid rgba(255, 255, 255, 0.4);
     background: rgba(255, 255, 255, 0.2);
@@ -314,6 +317,7 @@ h3{
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* Filled states */
 .circle.correct {
     background: rgba(102, 221, 119, 0.8);
     border-color: #4fc45f;
