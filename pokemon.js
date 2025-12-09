@@ -255,6 +255,7 @@ function handleGuess(selected) {
         } else {
             setTimeout(() => {
         enableAllButtons();
+        timeLeft = difficultySettings[currentDifficulty].time;
         startTimer();
     }, 900);
         }
