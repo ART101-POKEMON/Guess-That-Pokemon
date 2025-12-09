@@ -253,7 +253,10 @@ function handleGuess(selected) {
                 }
             }, 1500);
         } else {
-            setTimeout(enableAllButtons, 900);
+            setTimeout(() => {
+        enableAllButtons();
+        startTimer();
+    }, 900);
         }
     }
 }
