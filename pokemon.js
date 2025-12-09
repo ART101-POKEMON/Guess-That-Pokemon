@@ -11,6 +11,10 @@ let attempt = 0;
 let timerInterval = null;
 let timeLeft = 12;
 
+// Round tracking for 5-round sessions
+let roundNumber = 0;
+let roundResults = [];
+
 // Guess tracking
 let totalGuesses = 0;
 let correctGuesses = 0;
@@ -85,6 +89,7 @@ async function initGame() {
     totalGuesses = 0;
     correctGuesses = 0;
     guessHistory = [];
+    resetRoundTracker();
     updateScore();
     updateGuessHistory();
     await preloadPokemonNames();
@@ -105,11 +110,12 @@ function setupDifficultyButtons() {
             difficultyButtons.forEach(b => b.classList.remove("active"));
             btn.classList.add("active");
 
-            // Reset score and guess history when difficulty changes
+
             score = 0;
             totalGuesses = 0;
             correctGuesses = 0;
             guessHistory = [];
+            resetRoundTracker();
             updateScore();
             updateGuessHistory();
 
@@ -184,7 +190,12 @@ function startTimer() {
             clearInterval(timerInterval);
             stopAllSounds();
             revealPokemon(false);
-            setTimeout(() => loadNewPokemon(), 1200);
+            updateRoundTracker(false);
+            setTimeout(() => {
+                if (roundNumber < 5) {
+                    loadNewPokemon();
+                }
+            }, 1200);
         }
     }, 1000);
 }
@@ -216,9 +227,12 @@ function handleGuess(selected) {
         correctSound.play();
         score++;
         updateScore();
+        updateRoundTracker(true);
         setTimeout(() => {
             clearHighlights();
-            loadNewPokemon();
+            if (roundNumber < 5) {
+                loadNewPokemon();
+            }
         }, 1200);
     } 
     // WRONG
@@ -229,11 +243,14 @@ function handleGuess(selected) {
         if (attempt >= 2) {
             score = 0;
             updateScore();
+            updateRoundTracker(false);
             pokemonImage.classList.remove("silhouette");
             setTimeout(() => {
                 stopAllSounds();
                 clearHighlights();
-                loadNewPokemon();
+                if (roundNumber < 5) {
+                    loadNewPokemon();
+                }
             }, 1500);
         } else {
             setTimeout(enableAllButtons, 900);
@@ -319,6 +336,45 @@ function updateScore() {
 
 function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+// ---------------------------------------------
+// UPDATE ROUND TRACKER CIRCLES
+// ---------------------------------------------
+function updateRoundTracker(correct) {
+    if (roundNumber < 5) {
+        const circle = document.getElementById(`circle${roundNumber + 1}`);
+        if (circle) {
+            circle.classList.add(correct ? 'correct' : 'incorrect');
+        }
+        roundResults.push(correct);
+        roundNumber++;
+        
+
+        if (roundNumber >= 5) {
+            setTimeout(() => {
+                showRoundComplete();
+                resetRoundTracker();
+                loadNewPokemon();
+            }, 1500);
+        }
+    }
+}
+
+function resetRoundTracker() {
+    roundNumber = 0;
+    roundResults = [];
+    for (let i = 1; i <= 5; i++) {
+        const circle = document.getElementById(`circle${i}`);
+        if (circle) {
+            circle.classList.remove('correct', 'incorrect');
+        }
+    }
+}
+
+function showRoundComplete() {
+    const correctCount = roundResults.filter(r => r).length;
+    alert(`Round Complete! You got ${correctCount} out of 5 correct!`);
 }
 
 // ---------------------------------------------
