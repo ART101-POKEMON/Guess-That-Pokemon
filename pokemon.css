@@ -68,7 +68,6 @@ h1{
 .score, .timer {
     position: fixed;
     left: 10px;
-   
     border-radius: 10px;
     box-shadow: 0 3px 10px rgba(0,0,0,0.2);
     font-weight: bold;
@@ -235,7 +234,9 @@ h1{
 .reference-bank,
 .score,
 .pokemon-list,
-.timer,
+.timer,  
+.guess-history,
+.difficulty-btn,
 .modal-content {
     background: rgba(170, 220, 143, 0.118);    /* translucent white */
     backdrop-filter: blur(15px);              /* frosted-glass blur */
@@ -262,4 +263,25 @@ IMAGES
     display: flex;
     justify-content: center; 
     margin-top: 50px;
+} 
+/* ================================
+DIFFICULTY MODE BUTTONS
+================================ */ 
+.difficulty-btn{  
+    font-size: 20px;
+    max-height: 150px; 
+    max-width: 150px;  
+    color:rgb(32, 32, 192); 
+} 
+/* ================================
+GUESS HISTORY
+================================ */  
+h3{ 
+    text-align: center; 
+    color:rgb(82, 41, 178); 
+    text-shadow:0 2px #0a5b17;  
+    font-size: 22px;
+} 
+.guess-history{ 
+    text-align:center; 
 }
