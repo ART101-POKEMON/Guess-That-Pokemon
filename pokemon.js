@@ -253,11 +253,12 @@ function handleGuess(selected) {
                 }
             }, 1500);
         } else {
+            timeLeft = difficultySettings[currentDifficulty].time;
+            document.getElementById("timer").textContent = timeLeft; 
             setTimeout(() => {
-        enableAllButtons();
-        timeLeft = difficultySettings[currentDifficulty].time;
-        startTimer();
-    }, 900);
+                enableAllButtons();
+                startTimer();
+            }, 900);
         }
     }
 }
