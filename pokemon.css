@@ -247,6 +247,18 @@ h1{
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
 } 
 
+.volume-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+#volumeSlider {
+    width: 150px;
+    cursor: pointer;
+}
+
 /* ================================
 IMAGES
 ================================ */ 
