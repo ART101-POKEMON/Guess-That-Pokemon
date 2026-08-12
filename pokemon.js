@@ -11,6 +11,8 @@ let attempt = 0;
 let timerInterval = null;
 let timeLeft = 12;
 
+const volumeSlider = document.getElementById("volumeSlider");
+
 // Round tracking for 5-round sessions
 let roundNumber = 0;
 let roundResults = [];
@@ -299,6 +301,25 @@ function updateGuessHistory() {
         if (correctElem) correctElem.style.color = "black";
         if (totalElem) totalElem.style.color = "black";
     }
+}
+
+// ---------------------------------------------
+// VOLUME CONTROL
+// ---------------------------------------------
+function setGameVolume(volume) {
+    const sounds = document.querySelectorAll("audio");
+
+    sounds.forEach(sound => {
+        sound.volume = volume;
+    });
+}
+
+if (volumeSlider) {
+    setGameVolume(volumeSlider.value);
+
+    volumeSlider.addEventListener("input", () => {
+        setGameVolume(volumeSlider.value);
+    });
 }
 
 // ---------------------------------------------
