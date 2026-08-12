@@ -64,6 +64,18 @@
     <audio id="lowhpSound" src="sounds/lowhp.mp3"></audio>
     <audio id="correctSound" src="sounds/correct.mp3"></audio>
 
+    <div class="volume-control">
+        <label for="volumeSlider">🔊 Volume</label>
+        <input
+            type="range"
+            id="volumeSlider"
+            min="0"
+            max="1"
+            step="0.01"
+            value="0.5"
+        >
+    </div>
+
     <!-- TIMER -->
     <div class="timer">
         Time Left: <span id="timer">12</span>s
